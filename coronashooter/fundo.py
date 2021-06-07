@@ -8,7 +8,7 @@ class Fundo:
     Esta classe cria o fundo do jogo
     """
 
-    def __init__(self, image="space.png"):
+    def __init__(self, image="fundo_teste.png"):
         """
         Desenha o fundo da tela
         """
@@ -32,7 +32,11 @@ class Fundo:
                 back.blit(image, (i * self.imagesize[0], j * self.imagesize[1]))
 
         self.image = back
-
+        self.fonte = pygame.font.Font("freesansbold.ttf", 32)
+        self.texto = self.fonte.render("Pontuação\n\n.", True, (0,255,0), (0,0,0))
+        self.texto_rect = self.texto.get_rect()
+        self.texto_rect.center = (150,30)
+        
     def update(self, dt):
         self.pos[1] += 1
         if self.pos[1] > 0:
@@ -40,7 +44,13 @@ class Fundo:
 
     # update()
 
-    def draw(self, screen):
+    def draw(self, screen, vidas=0, pontuacao=0, nivel=1):
+        vidas = f"Vidas: {vidas}"
+        nivel = f"Nível: {nivel}"
+        pontuacao = f"Pontuaão: {pontuacao}"
+        self.texto = self.fonte.render(f"{vidas}\n{nivel}\n{pontuacao}", True, (0,255,0), (255,255,255))
+        
         screen.blit(self.image, self.pos)
+        screen.blit(self.texto, self.texto_rect)
 
 

@@ -18,7 +18,7 @@ class Jogo:
     def __init__(self, size=(1200, 800), fullscreen=False):
         self.elementos = {}
         pygame.init()
-        self.tela = pygame.display.set_mode(size)
+        self.tela = pygame.display.set_mode(size, FULLSCREEN)
         self.fundo = Fundo()
         self.jogador = None
         self.interval = 0
@@ -33,14 +33,19 @@ class Jogo:
         self.run = True
         self.atirar = 0
         self.ultimo_tempo = time.time()
+        
 
     def manutenção(self):
-        r = random.randint(0, 100)
+        r = random.randint(0, 10)
         x = random.randint(1, self.screen_size[0])
-        if r > (40 * len(self.elementos["virii"])):
+        virii = self.elementos["virii"]
+        if r > (len(virii)):
             enemy = Virus([0, 0])
             size = enemy.get_size()
-            enemy.set_pos([x, 0])
+            enemy.set_pos([min(max(x, size[0]/2), self.screen_size[0]-size[0]/2), 0])
+            mesmo_lugar = pygame.sprite.spritecollide(enemy, virii, False)
+            if mesmo_lugar:
+                return
             self.elementos["virii"].add(enemy)
 
     def muda_nivel(self):
@@ -60,7 +65,7 @@ class Jogo:
             v.update(dt)
 
     def desenha_elementos(self):
-        self.fundo.draw(self.tela)
+        self.fundo.draw(self.tela, self.jogador.get_lives(), self.jogador.get_pontos())
         for v in self.elementos.values():
             v.draw(self.tela)
 
@@ -177,10 +182,11 @@ class Nave(ElementoSprite):
         self.lives = lives
 
     def colisão(self):
+        self.set_lives(self.get_lives() - 1)
         if self.get_lives() <= 0:
             self.kill()
-        else:
-            self.set_lives(self.get_lives() - 1)
+        
+            
 
     def atira(self, lista_de_tiros, image=None):
         s = list(self.get_speed())
@@ -188,10 +194,11 @@ class Nave(ElementoSprite):
         Tiro(self.get_pos(), s, image, lista_de_tiros)
 
     def alvejado(self):
+        self.set_lives(self.get_lives() - 1)
         if self.get_lives() <= 0:
             self.kill()
-        else:
-            self.set_lives(self.get_lives() - 1)
+        
+            
 
     @property
     def morto(self):
@@ -217,7 +224,7 @@ class Nave(ElementoSprite):
 class Virus(Nave):
     def __init__(self, position, lives=1, speed=None, image=None, size=(100, 100)):
         if not image:
-            image = "virus.png"
+            image = "virinho.png"
         super().__init__(position, lives, speed, image, size)
 
 
@@ -301,7 +308,7 @@ class Jogador(Nave):
 class Tiro(ElementoSprite):
     def __init__(self, position, speed=None, image=None, list=None):
         if not image:
-            image = "tiro.png"
+            image = "estrelinha.png"
         super().__init__(image, position, speed)
         if list is not None:
             self.add(list)
