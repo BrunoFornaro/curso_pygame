@@ -45,10 +45,10 @@ class Fundo:
     # update()
 
     def draw(self, screen, vidas=0, pontuacao=0, nivel=1):
-        vidas = f"Vidas: {vidas}"
+        vidas = f"Vidas: {vidas * 'S2 '}"
         nivel = f"Nível: {nivel}"
-        pontuacao = f"Pontuaão: {pontuacao}"
-        self.texto = self.fonte.render(f"{vidas}\n{nivel}\n{pontuacao}", True, (0,255,0), (255,255,255))
+        pontuacao = f"Pontução: {pontuacao}"
+        self.texto = self.fonte.render(f"{vidas}. {nivel}. {pontuacao}", True, (0,255,0), (255,255,255))
         
         screen.blit(self.image, self.pos)
         screen.blit(self.texto, self.texto_rect)

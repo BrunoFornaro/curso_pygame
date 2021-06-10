@@ -6,7 +6,8 @@ from pygame.locals import (DOUBLEBUF,
                            K_LEFT,
                            K_RIGHT,
                            QUIT,
-                           K_ESCAPE, K_UP, K_DOWN, K_RCTRL, K_LCTRL
+                           K_ESCAPE, K_UP, K_DOWN, K_RCTRL, K_LCTRL,
+                           K_w, K_a, K_s, K_d, K_SPACE
                            )
 from fundo import Fundo
 from elementos import ElementoSprite
@@ -40,7 +41,14 @@ class Jogo:
         x = random.randint(1, self.screen_size[0])
         virii = self.elementos["virii"]
         if r > (len(virii)):
-            enemy = Virus([0, 0])
+            if self.nivel > 0:
+                nivel_virus = random.randint(0, 10)
+                if nivel_virus > 7:
+                    enemy = Virus([0, 0], lives = 3, image="virinho_mau.png") 
+                else:
+                    enemy = Virus([0, 0]) 
+            else:
+                enemy = Virus([0, 0])
             size = enemy.get_size()
             enemy.set_pos([min(max(x, size[0]/2), self.screen_size[0]-size[0]/2), 0])
             mesmo_lugar = pygame.sprite.spritecollide(enemy, virii, False)
@@ -50,14 +58,14 @@ class Jogo:
 
     def muda_nivel(self):
         xp = self.jogador.get_pontos()
-        if xp > 10 and self.level == 0:
-            self.fundo = Fundo("tile2.png")
+        if xp > 10 and self.nivel == 0:
+            self.fundo = Fundo("fundo2.png")
             self.nivel = 1
             self.jogador.set_lives(self.jogador.get_lives() + 3)
-        elif xp > 50 and self.level == 1:
-            self.fundo = Fundo("tile3.png")
+        elif xp > 50 and self.nivel == 1:
+            self.fundo = Fundo("fundo3.png")
             self.nivel = 2
-            self.jogador.set_lives(self.player.get_lives() + 6)
+            self.jogador.set_lives(self.jogador.get_lives() + 6)
 
     def atualiza_elementos(self, dt):
         self.fundo.update(dt)
@@ -65,7 +73,7 @@ class Jogo:
             v.update(dt)
 
     def desenha_elementos(self):
-        self.fundo.draw(self.tela, self.jogador.get_lives(), self.jogador.get_pontos())
+        self.fundo.draw(self.tela, self.jogador.get_lives(), self.jogador.get_pontos(),self.nivel)
         for v in self.elementos.values():
             v.draw(self.tela)
 
@@ -113,7 +121,7 @@ class Jogo:
             key = event.key
             if key == K_ESCAPE:
                 self.run = False
-            elif key in (K_LCTRL, K_RCTRL):
+            elif key in (K_LCTRL, K_RCTRL, K_SPACE):
                 if event.type == KEYDOWN:
                     self.interval = 0
                     self.atirar = 1
@@ -121,13 +129,13 @@ class Jogo:
                 elif event.type == KEYUP:
                     self.interval = 0
                     self.atirar = 0
-            elif key == K_UP:
+            elif key == K_UP or key == K_w:
                 self.jogador.accel_top()
-            elif key == K_DOWN:
+            elif key == K_DOWN or key == K_s:
                 self.jogador.accel_bottom()
-            elif key == K_RIGHT:
+            elif key == K_RIGHT or key == K_d:
                 self.jogador.accel_right()
-            elif key == K_LEFT:
+            elif key == K_LEFT or key == K_a:
                 self.jogador.accel_left()
         
         if self.atirar == 1:
@@ -139,7 +147,7 @@ class Jogo:
         keys = pygame.key.get_pressed()
         if self.interval > 10:
             self.interval = 0
-            if keys[K_RCTRL] or keys[K_LCTRL]:
+            if keys[K_RCTRL] or keys[K_LCTRL] or keys[K_SPACE]:
                 self.jogador.atira(self.elementos["tiros"])
 
     def loop(self):
@@ -161,6 +169,7 @@ class Jogo:
             self.atualiza_elementos(dt)
 
             #print(self.jogador.get_lives())
+            self.muda_nivel()
 
             # Desenhe no back buffer
             self.desenha_elementos()
@@ -273,8 +282,12 @@ class Jogador(Nave):
 
     def atira(self, lista_de_tiros, image=None):
         l = 1
-        if self.pontos > 10: l = 3
-        if self.pontos > 50: l = 5
+        if self.pontos > 10: 
+            l = 3
+            #self.nivel = 1
+        if self.pontos > 50: 
+            l = 5
+            #self.nivel = 2
 
         p = self.get_pos()
         speeds = self.get_fire_speed(l)
