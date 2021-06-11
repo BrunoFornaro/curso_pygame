@@ -7,7 +7,7 @@ from pygame.locals import (DOUBLEBUF,
                            K_RIGHT,
                            QUIT,
                            K_ESCAPE, K_UP, K_DOWN, K_RCTRL, K_LCTRL,
-                           K_w, K_a, K_s, K_d, K_SPACE
+                           K_w, K_a, K_s, K_d, K_SPACE, K_p
                            )
 from fundo import Fundo
 from elementos import ElementoSprite
@@ -35,6 +35,10 @@ class Jogo:
         self.atirar = 0
         self.ultimo_tempo = time.time()
         
+        self.segundo_jogador = None
+        self.jogar_de_dois = 0
+        self.atirar2 = 0
+        self.ultimo_tempo2 = time.time()
 
     def manutenção(self):
         r = random.randint(0, 10)
@@ -103,6 +107,7 @@ class Jogo:
         if self.jogador.morto:
             self.run = False
             return
+        
         # Verifica se o personagem atingiu algum alvo.
         hitted = self.verifica_impactos(self.elementos["tiros"],
                                         self.elementos["virii"],
@@ -121,7 +126,7 @@ class Jogo:
             key = event.key
             if key == K_ESCAPE:
                 self.run = False
-            elif key in (K_LCTRL, K_RCTRL, K_SPACE):
+            elif key in (K_LCTRL, K_RCTRL):
                 if event.type == KEYDOWN:
                     self.interval = 0
                     self.atirar = 1
@@ -129,26 +134,74 @@ class Jogo:
                 elif event.type == KEYUP:
                     self.interval = 0
                     self.atirar = 0
-            elif key == K_UP or key == K_w:
+            elif key == (K_SPACE):
+                if event.type == KEYDOWN:
+                    self.interval = 0
+                    self.atirar2 = 1
+                #self.jogador.atira(self.elementos["tiros"])
+                elif event.type == KEYUP:
+                    self.interval = 0
+                    self.atirar2 = 0
+            elif key == K_UP:
                 self.jogador.accel_top()
-            elif key == K_DOWN or key == K_s:
+            elif key == K_DOWN:
                 self.jogador.accel_bottom()
-            elif key == K_RIGHT or key == K_d:
+            elif key == K_RIGHT:
                 self.jogador.accel_right()
-            elif key == K_LEFT or key == K_a:
+            elif key == K_LEFT:
                 self.jogador.accel_left()
+            elif key == K_w:
+                self.segundo_jogador.accel_top()
+            elif key == K_s:
+                self.segundo_jogador.accel_bottom()
+            elif key == K_d:
+                self.segundo_jogador.accel_right()
+            elif key == K_a:
+                self.segundo_jogador.accel_left()
+                
+# =============================================================================
+#         if event.type in (KEYDOWN, KEYUP):
+#             key = event.key
+#             if key == K_ESCAPE:
+#                 self.run = False
+#             elif key in (K_LCTRL, K_RCTRL, K_SPACE):
+#                 if event.type == KEYDOWN:
+#                     self.interval = 0
+#                     self.atirar = 1
+#                 #self.jogador.atira(self.elementos["tiros"])
+#                 elif event.type == KEYUP:
+#                     self.interval = 0
+#                     self.atirar = 0
+#             elif key == K_UP or key == K_w:
+#                 self.jogador.accel_top()
+#             elif key == K_DOWN or key == K_s:
+#                 self.jogador.accel_bottom()
+#             elif key == K_RIGHT or key == K_d:
+#                 self.jogador.accel_right()
+#             elif key == K_LEFT or key == K_a:
+#                 self.jogador.accel_left()
+# =============================================================================
         
         if self.atirar == 1:
             diferenca_tempo_atual = time.time() - self.ultimo_tempo
             if diferenca_tempo_atual > 0.5:
                 self.ultimo_tempo = time.time()
                 self.jogador.atira(self.elementos["tiros"])
-
-        keys = pygame.key.get_pressed()
-        if self.interval > 10:
-            self.interval = 0
-            if keys[K_RCTRL] or keys[K_LCTRL] or keys[K_SPACE]:
-                self.jogador.atira(self.elementos["tiros"])
+                
+                
+        if self.atirar2 == 1:
+            diferenca_tempo_atual2 = time.time() - self.ultimo_tempo2
+            if diferenca_tempo_atual2 > 0.5:
+                self.ultimo_tempo2 = time.time()
+                self.segundo_jogador.atira(self.elementos["tiros"])
+                
+# =============================================================================
+#         keys = pygame.key.get_pressed()
+#         if self.interval > 10:
+#             self.interval = 0
+#             if keys[K_RCTRL] or keys[K_LCTRL] or keys[K_SPACE]:
+#                 self.jogador.atira(self.elementos["tiros"])
+# =============================================================================
 
     def loop(self):
         
@@ -156,7 +209,12 @@ class Jogo:
         dt = 16
         self.elementos['virii'] = pygame.sprite.RenderPlain(Virus([120, 50]))
         self.jogador = Jogador([200, 400], 3)
+        
+        self.segundo_jogador = Jogador([200, 400], 3, image="dollynho_doidao.png")
+        
         self.elementos['jogador'] = pygame.sprite.RenderPlain(self.jogador)
+        self.elementos['jogador'].add(self.segundo_jogador)
+        
         self.elementos['tiros'] = pygame.sprite.RenderPlain()
         self.elementos['tiros_inimigo'] = pygame.sprite.RenderPlain()
         while self.run:
@@ -331,3 +389,40 @@ if __name__ == '__main__':
     J = Jogo()
     J.loop()
     pygame.quit()
+
+
+'''
+1. Concertar player 2
+
+2. Colocar música
+3. Fazer chefão - (análisar)
+    Soltar mais inimigos
+    Inimigos mais rápidos
+4. Movimento orgânico dos virus
+5. Mascara de colisão
+6. Incluir "power ups"
+7. Mudar aceleração
+8. Fazer menu / Tela inicial
+9. Tela de Game Over
+10. Adicionar ranking (pontos ultimos jogadores)
+11. Mudar tamanho dos sprites
+12. Fazer o jogo se tornar "compilado" (ter icone de iniciar)
+
+
+
+Decidir os "gráficos" - OK
+
+
+DOCUMENTAR TODO CÓDIGO QUE ALTERAR
+'''
+
+'''
+
+O que precisa refazer:
+Inserir virus diferentes
+Corrigir o muda nivel
+Adicionar placar
+Mudar como os tiros funcionam
+Corrigir colisão dos vírus
+
+'''
