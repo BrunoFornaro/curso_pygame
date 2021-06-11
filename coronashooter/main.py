@@ -31,7 +31,7 @@ class Jogo:
         pygame.display.set_caption('Corona Shooter')
         self.run = True
 
-    def manutenção(self):
+    def manutencao(self):
         r = random.randint(0, 100)
         x = random.randint(1, self.screen_size[0])
         if r > (40 * len(self.elementos["virii"])):
@@ -74,7 +74,7 @@ class Jogo:
                 action()
             return elemento.morto
 
-    def ação_elemento(self):
+    def acao_elemento(self):
         self.verifica_impactos(self.jogador, self.elementos["tiros_inimigo"],
                                self.jogador.alvejado)
         if self.jogador.morto:
@@ -83,7 +83,7 @@ class Jogo:
 
         # Verifica se o personagem trombou em algum inimigo
         self.verifica_impactos(self.jogador, self.elementos["virii"],
-                               self.jogador.colisão)
+                               self.jogador.colisao)
         if self.jogador.morto:
             self.run = False
             return
@@ -134,8 +134,8 @@ class Jogo:
             clock.tick(1000 / dt)
 
             self.trata_eventos()
-            self.ação_elemento()
-            self.manutenção()
+            self.acao_elemento()
+            self.manutencao()
             # Atualiza Elementos
             self.atualiza_elementos(dt)
 
@@ -158,7 +158,7 @@ class Nave(ElementoSprite):
     def set_lives(self, lives):
         self.lives = lives
 
-    def colisão(self):
+    def colisao(self):
         if self.get_lives() <= 0:
             self.kill()
         else:
