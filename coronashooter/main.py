@@ -41,15 +41,20 @@ class Jogo:
             self.elementos["virii"].add(enemy)
 
     def muda_nivel(self):
+        # Verifica o xp
         xp = self.jogador.get_pontos()
-        if xp > 10 and self.level == 0:
-            self.fundo = Fundo("tile2.png")
+        # Verifica se deve mudar o nível pra 1
+        if xp > 10 and self.nivel == 0:
+            # Altera o fundo
+            self.fundo = Fundo("fundo2.png")
+            # Altera o nível
             self.nivel = 1
+            # Adiciona mais vidas para o jogador
             self.jogador.set_lives(self.jogador.get_lives() + 3)
-        elif xp > 50 and self.level == 1:
-            self.fundo = Fundo("tile3.png")
+        elif xp > 50 and self.nivel == 1:
+            self.fundo = Fundo("fundo3.png")
             self.nivel = 2
-            self.jogador.set_lives(self.player.get_lives() + 6)
+            self.jogador.set_lives(self.jogador.get_lives() + 6)
 
     def atualiza_elementos(self, dt):
         self.fundo.update(dt)
@@ -138,7 +143,10 @@ class Jogo:
             self.manutencao()
             # Atualiza Elementos
             self.atualiza_elementos(dt)
-
+            
+            # Muda o nível
+            self.muda_nivel()
+            
             # Desenhe no back buffer
             self.desenha_elementos()
             pygame.display.flip()
@@ -292,3 +300,4 @@ class Tiro(ElementoSprite):
 if __name__ == '__main__':
     J = Jogo()
     J.loop()
+    pygame.quit()
