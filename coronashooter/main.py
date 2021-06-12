@@ -12,6 +12,7 @@ from fundo import Fundo
 from elementos import ElementoSprite
 import random
 
+from time import time
 
 class Jogo:
     def __init__(self, size=(1000, 1000), fullscreen=False):
@@ -20,7 +21,7 @@ class Jogo:
         self.tela = pygame.display.set_mode(size)
         self.fundo = Fundo()
         self.jogador = None
-        self.interval = 0
+        
         self.nivel = 0
         flags = DOUBLEBUF
         if fullscreen:
@@ -105,13 +106,10 @@ class Jogo:
         if event.type == pygame.QUIT:
             self.run = False
 
-        if event.type in (KEYDOWN, KEYUP):
+        if event.type == KEYDOWN: # Verifica se foi pressionada uma tecla
             key = event.key
-            if key == K_ESCAPE:
-                self.run = False
-            elif key in (K_LCTRL, K_RCTRL):
-                self.interval = 0
-                self.jogador.atira(self.elementos["tiros"])
+            if key in (K_LCTRL, K_RCTRL):
+                self.jogador.deve_atirar = 1 # Deve atirar
             elif key == K_UP:
                 self.jogador.accel_top()
             elif key == K_DOWN:
@@ -120,12 +118,17 @@ class Jogo:
                 self.jogador.accel_right()
             elif key == K_LEFT:
                 self.jogador.accel_left()
-
-        keys = pygame.key.get_pressed()
-        if self.interval > 10:
-            self.interval = 0
-            if keys[K_RCTRL] or keys[K_LCTRL]:
-                self.jogador.atira(self.elementos["tiros"])
+                
+        if event.type == KEYUP: # Verifica se a tecla foi solta
+            key = event.key
+            if key == K_ESCAPE:
+                self.run = False
+            elif key in (K_LCTRL, K_RCTRL):
+                self.jogador.deve_atirar = 0 # Não deve atirar
+            
+            
+        self.jogador.atira(self.elementos["tiros"]) # Pede par atirar (mas atira somente se o deve_atirar for igual a 1)
+        
 
     def loop(self):
         clock = pygame.time.Clock()
@@ -227,6 +230,9 @@ class Jogador(Nave):
             image = "seringa.png"
         super().__init__(position, lives, [0, 0], image, new_size)
         self.pontos = 0
+        
+        self.deve_atirar = 0 # Define se deve ou não atirar quando chamar o método atira
+        self.tempo_ultimo_tiro = 0 # Tempo do ultimo tiro
 
     def update(self, dt):
         move_speed = (self.speed[0] * dt / 16,
@@ -255,14 +261,20 @@ class Jogador(Nave):
         self.pontos = pontos
 
     def atira(self, lista_de_tiros, image=None):
-        l = 1
-        if self.pontos > 10: l = 3
-        if self.pontos > 50: l = 5
-
-        p = self.get_pos()
-        speeds = self.get_fire_speed(l)
-        for s in speeds:
-            Tiro(p, s, image, lista_de_tiros)
+        
+        if self.deve_atirar == 1: # Verifica se realmente é para criar um novo tiro
+            diferenca_tempo = time() - self.tempo_ultimo_tiro # Calcula a diferença do ultimo tiro para o momento atual
+            if diferenca_tempo > 0.5: # Verifica se pode atirar pela diferença de tempo
+                self.tempo_ultimo_tiro =  time() # Atualiza o tempo do ultimo tiro
+                
+                l = 1
+                if self.pontos > 10: l = 3
+                if self.pontos > 50: l = 5
+        
+                p = self.get_pos()
+                speeds = self.get_fire_speed(l)
+                for s in speeds:
+                    Tiro(p, s, image, lista_de_tiros)
 
     def get_fire_speed(self, shots):
         speeds = []
