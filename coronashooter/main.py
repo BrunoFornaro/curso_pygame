@@ -54,12 +54,23 @@ class Jogo:
         self.screen = pygame.display.get_surface()
 
     def manutencao(self):
-        r = random.randint(0, 100)
+        r = random.randint(0, 10)
         x = random.randint(1, self.screen_size[0])
-        if r > (40 * len(self.elementos["virii"])):
-            enemy = Virus([0, 0])
+        virii = self.elementos["virii"]
+        if r > (len(virii)):
+            if self.nivel > 0:
+                nivel_virus = random.randint(0, 10)
+                if nivel_virus > 7:
+                    enemy = Virus([0, 0], lives = 3, image="virinho_mau.png") 
+                else:
+                    enemy = Virus([0, 0]) 
+            else:
+                enemy = Virus([0, 0])
             size = enemy.get_size()
-            enemy.set_pos([x, 0])
+            enemy.set_pos([min(max(x, size[0]/2), self.screen_size[0]-size[0]/2), 0])
+            mesmo_lugar = pygame.sprite.spritecollide(enemy, virii, False)
+            if mesmo_lugar:
+                return
             self.elementos["virii"].add(enemy)
 
     def muda_nivel(self):
