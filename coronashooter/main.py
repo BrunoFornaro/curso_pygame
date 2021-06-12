@@ -135,6 +135,7 @@ class Jogo:
         if self.jogador.morto:
             self.run = False
             return
+        
         # Verifica se o personagem atingiu algum alvo.
         hitted = self.verifica_impactos(self.elementos["tiros"],
                                         self.elementos["virii"],
@@ -219,10 +220,9 @@ class Nave(ElementoSprite):
         self.lives = lives
 
     def colisao(self):
+        self.set_lives(self.get_lives() - 1)
         if self.get_lives() <= 0:
             self.kill()
-        else:
-            self.set_lives(self.get_lives() - 1)
 
     def atira(self, lista_de_tiros, image=None):
         s = list(self.get_speed())
@@ -230,10 +230,11 @@ class Nave(ElementoSprite):
         Tiro(self.get_pos(), s, image, lista_de_tiros)
 
     def alvejado(self):
+        self.set_lives(self.get_lives() - 1)
         if self.get_lives() <= 0:
             self.kill()
-        else:
-            self.set_lives(self.get_lives() - 1)
+        
+            
 
     @property
     def morto(self):
