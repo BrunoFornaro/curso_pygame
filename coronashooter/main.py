@@ -168,6 +168,14 @@ class Jogo:
                 self.run = False
             elif key in (K_LCTRL, K_RCTRL):
                 self.jogador.deve_atirar = 0 # Não deve atirar
+            elif key == K_UP:
+                self.jogador.set_speed((self.jogador.get_speed()[0],0)) # A velocidade no eixo y zera
+            elif key == K_DOWN:
+                self.jogador.set_speed((self.jogador.get_speed()[0],0)) # A velocidade no eixo y zera
+            elif key == K_RIGHT:
+                self.jogador.set_speed((0,self.jogador.get_speed()[1])) # A velocidade no eixo x zera
+            elif key == K_LEFT:
+                self.jogador.set_speed((0,self.jogador.get_speed()[1])) # A velocidade no eixo x zera
             
             
         self.jogador.atira(self.elementos["tiros"]) # Pede par atirar (mas atira somente se o deve_atirar for igual a 1)
@@ -193,8 +201,6 @@ class Jogo:
             
             # Muda o nível
             self.muda_nivel()
-            
-            
             
             # Desenhe no back buffer
             self.desenha_elementos()
