@@ -13,12 +13,13 @@ from elementos import ElementoSprite
 import random
 
 from time import time
+import os
 
 class Jogo:
     def __init__(self, size=(1000, 1000), fullscreen=False):
         self.elementos = {}
         pygame.init()
-        self.tela = pygame.display.set_mode(size)
+        self.tela = pygame.display.set_mode(size, FULLSCREEN) # Rodar em fullscreen
         self.fundo = Fundo()
         self.jogador = None
         
@@ -31,6 +32,26 @@ class Jogo:
         pygame.mouse.set_visible(0)
         pygame.display.set_caption('Corona Shooter')
         self.run = True
+        
+        self.fonte = pygame.font.Font("freesansbold.ttf", 32) # Define fonte
+        
+        # Define os textos do placar
+        self.texto_vidas = self.fonte.render("Vidas: ", True, (0,255,0), (0,0,0))
+        self.texto_pontos = self.fonte.render("Pontos: ", True, (0,255,0), (0,0,0))
+        self.texto_nivel = self.fonte.render("Nível: ", True, (0,255,0), (0,0,0))
+        
+        # Define os "retângulos" do placar
+        self.texto_vidas_rect = self.texto_vidas.get_rect()
+        self.texto_pontos_rect = self.texto_vidas.get_rect()
+        self.texto_nivel_rect = self.texto_vidas.get_rect()
+        
+        # Define a posição do placar
+        self.texto_vidas_rect.center = (100,30)
+        self.texto_pontos_rect.center = (100,64)
+        self.texto_nivel_rect.center = (100,98)
+        
+        # Define a tela
+        self.screen = pygame.display.get_surface()
 
     def manutencao(self):
         r = random.randint(0, 100)
@@ -45,14 +66,14 @@ class Jogo:
         # Verifica o xp
         xp = self.jogador.get_pontos()
         # Verifica se deve mudar o nível pra 1
-        if xp > 10 and self.nivel == 0:
+        if xp >= 10 and self.nivel == 0:
             # Altera o fundo
             self.fundo = Fundo("fundo2.png")
             # Altera o nível
             self.nivel = 1
             # Adiciona mais vidas para o jogador
             self.jogador.set_lives(self.jogador.get_lives() + 3)
-        elif xp > 50 and self.nivel == 1:
+        elif xp >= 50 and self.nivel == 1:
             self.fundo = Fundo("fundo3.png")
             self.nivel = 2
             self.jogador.set_lives(self.jogador.get_lives() + 6)
@@ -66,7 +87,17 @@ class Jogo:
         self.fundo.draw(self.tela)
         for v in self.elementos.values():
             v.draw(self.tela)
-
+    
+    def placar(self):
+        # Gera os textos do placar
+        self.texto_vidas = self.fonte.render(f"Vidas: {self.jogador.get_lives()}", True, (0,255,0), (0,0,0))
+        self.texto_pontos = self.fonte.render(f"Pontos: {self.jogador.get_pontos()}", True, (0,255,0), (0,0,0))
+        self.texto_nivel = self.fonte.render(f"Nível: {self.nivel}", True, (0,255,0), (0,0,0))
+        # Desenha o placar
+        self.screen.blit(self.texto_vidas, self.texto_vidas_rect)
+        self.screen.blit(self.texto_pontos, self.texto_pontos_rect)
+        self.screen.blit(self.texto_nivel, self.texto_nivel_rect)
+        
     def verifica_impactos(self, elemento, list, action):
         if isinstance(elemento, pygame.sprite.RenderPlain):
             hitted = pygame.sprite.groupcollide(elemento, list, 1, 0)
@@ -144,14 +175,21 @@ class Jogo:
             self.trata_eventos()
             self.acao_elemento()
             self.manutencao()
+            
             # Atualiza Elementos
             self.atualiza_elementos(dt)
             
             # Muda o nível
             self.muda_nivel()
             
+            
+            
             # Desenhe no back buffer
             self.desenha_elementos()
+            
+            # Desenhar placar
+            self.placar()
+            
             pygame.display.flip()
 
 
