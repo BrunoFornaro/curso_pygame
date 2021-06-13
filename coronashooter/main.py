@@ -6,7 +6,8 @@ from pygame.locals import (DOUBLEBUF,
                            K_LEFT,
                            K_RIGHT,
                            QUIT,
-                           K_ESCAPE, K_UP, K_DOWN, K_RCTRL, K_LCTRL
+                           K_ESCAPE, K_UP, K_DOWN, K_RCTRL, K_LCTRL,
+                           K_SPACE, K_w, K_s, K_a, K_d # Para o jogo funcionar com o w, a, s, d e espaço
                            )
 from fundo import Fundo
 from elementos import ElementoSprite
@@ -151,30 +152,30 @@ class Jogo:
 
         if event.type == KEYDOWN: # Verifica se foi pressionada uma tecla
             key = event.key
-            if key in (K_LCTRL, K_RCTRL):
+            if key in (K_LCTRL, K_RCTRL, K_SPACE):
                 self.jogador.deve_atirar = 1 # Deve atirar
-            elif key == K_UP:
+            elif key in (K_UP, K_w):
                 self.jogador.accel_top()
-            elif key == K_DOWN:
+            elif key in (K_DOWN, K_s):
                 self.jogador.accel_bottom()
-            elif key == K_RIGHT:
+            elif key in (K_RIGHT, K_d):
                 self.jogador.accel_right()
-            elif key == K_LEFT:
+            elif key in (K_LEFT, K_a):
                 self.jogador.accel_left()
                 
         if event.type == KEYUP: # Verifica se a tecla foi solta
             key = event.key
             if key == K_ESCAPE:
                 self.run = False
-            elif key in (K_LCTRL, K_RCTRL):
+            elif key in (K_LCTRL, K_RCTRL, K_SPACE):
                 self.jogador.deve_atirar = 0 # Não deve atirar
-            elif key == K_UP:
+            elif key in (K_UP, K_w):
                 self.jogador.set_speed((self.jogador.get_speed()[0],0)) # A velocidade no eixo y zera
-            elif key == K_DOWN:
+            elif key in (K_DOWN, K_s):
                 self.jogador.set_speed((self.jogador.get_speed()[0],0)) # A velocidade no eixo y zera
-            elif key == K_RIGHT:
+            elif key in (K_RIGHT, K_d):
                 self.jogador.set_speed((0,self.jogador.get_speed()[1])) # A velocidade no eixo x zera
-            elif key == K_LEFT:
+            elif key in (K_LEFT, K_a):
                 self.jogador.set_speed((0,self.jogador.get_speed()[1])) # A velocidade no eixo x zera
             
             
