@@ -61,9 +61,9 @@ class Jogo:
             if self.nivel > 0:
                 nivel_virus = random.randint(0, 10)
                 if nivel_virus > 7:
-                    enemy = Virus([0, 0], lives = 3, image="virinho_mau.png") 
+                    enemy = Virus([0, 0], lives = 3, speed=[random.randint(-1,1), random.randint(2,4)], image="virinho_mau.png") 
                 else:
-                    enemy = Virus([0, 0]) 
+                    enemy = Virus([0, 0], speed=[random.randint(-1,1), random.randint(2,3)]) 
             else:
                 enemy = Virus([0, 0])
             size = enemy.get_size()
@@ -213,7 +213,7 @@ class Jogo:
 
 class Nave(ElementoSprite):
     def __init__(self, position, lives=0, speed=[0, 0], image=None, new_size=[83, 248]):
-        self.acceleration = [3, 3]
+        self.acceleration = [1, 1]
         if not image:
             image = "seringa.png"
         super().__init__(image, position, speed, new_size)
