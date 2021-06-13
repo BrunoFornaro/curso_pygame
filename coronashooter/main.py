@@ -154,13 +154,13 @@ class Jogo:
             key = event.key
             if key in (K_LCTRL, K_RCTRL, K_SPACE):
                 self.jogador.deve_atirar = 1 # Deve atirar
-            elif key in (K_UP, K_w):
+            elif key in (K_UP, K_w): # Agora funciona tanto na seta para cima quanto no w
                 self.jogador.accel_top()
-            elif key in (K_DOWN, K_s):
+            elif key in (K_DOWN, K_s): # Agora funciona tanto na seta para baixo quanto no s
                 self.jogador.accel_bottom()
-            elif key in (K_RIGHT, K_d):
+            elif key in (K_RIGHT, K_d): # Agora funciona tanto na seta para a direita quanto no d
                 self.jogador.accel_right()
-            elif key in (K_LEFT, K_a):
+            elif key in (K_LEFT, K_a): # Agora funciona tanto na seta para a esqueda quanto no a
                 self.jogador.accel_left()
                 
         if event.type == KEYUP: # Verifica se a tecla foi solta
@@ -214,11 +214,12 @@ class Jogo:
 
 class Nave(ElementoSprite):
     def __init__(self, position, lives=0, speed=[0, 0], image=None, new_size=[83, 248]):
-        self.acceleration = [1, 1]
+        self.acceleration = [3, 3]
         if not image:
             image = "seringa.png"
         super().__init__(image, position, speed, new_size)
         self.set_lives(lives)
+        self.limite = 7
 
     def get_lives(self):
         return self.lives
@@ -249,19 +250,23 @@ class Nave(ElementoSprite):
 
     def accel_top(self):
         speed = self.get_speed()
-        self.set_speed((speed[0], speed[1] - self.acceleration[1]))
+        if speed[1] - self.acceleration[1] > -self.limite:
+            self.set_speed((speed[0], speed[1] - self.acceleration[1]))
 
     def accel_bottom(self):
         speed = self.get_speed()
-        self.set_speed((speed[0], speed[1] + self.acceleration[1]))
+        if speed[1] + self.acceleration[1] < self.limite:
+            self.set_speed((speed[0], speed[1] + self.acceleration[1]))
 
     def accel_left(self):
         speed = self.get_speed()
-        self.set_speed((speed[0] - self.acceleration[0], speed[1]))
+        if speed[0] - self.acceleration[0] > -self.limite:
+            self.set_speed((speed[0] - self.acceleration[0], speed[1]))
 
     def accel_right(self):
         speed = self.get_speed()
-        self.set_speed((speed[0] + self.acceleration[0], speed[1]))
+        if speed[0] + self.acceleration[0] < self.limite:
+            self.set_speed((speed[0] + self.acceleration[0], speed[1]))
 
 
 class Virus(Nave):
