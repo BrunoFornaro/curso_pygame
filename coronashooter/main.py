@@ -55,14 +55,14 @@ class Jogo:
         self.screen = pygame.display.get_surface()
 
     def manutencao(self):
-        r = random.randint(0, 10)
+        r = random.randint(0, 14)
         x = random.randint(1, self.screen_size[0])
         virii = self.elementos["virii"]
         if r > (len(virii)):
             if self.nivel > 0:
                 nivel_virus = random.randint(0, 10)
                 if nivel_virus > 7:
-                    enemy = Virus([0, 0], lives = 3, speed=[random.randint(-1,1), random.randint(2,4)], image="virinho_mau.png") 
+                    enemy = Virus([0, 0], lives = 3, speed=[random.randint(-1,1), random.randint(3,4)], image="virinho_mau.png") 
                 else:
                     enemy = Virus([0, 0], speed=[random.randint(-1,1), random.randint(2,3)]) 
             else:
@@ -270,7 +270,7 @@ class Nave(ElementoSprite):
 
 
 class Virus(Nave):
-    def __init__(self, position, lives=1, speed=None, image=None, size=(100, 100)):
+    def __init__(self, position, lives=1, speed=None, image=None, size=(80, 80)):
         if not image:
             image = "virus.png"
         super().__init__(position, lives, speed, image, size)
@@ -287,7 +287,7 @@ class Jogador(Nave):
     das outras.
     """
 
-    def __init__(self, position, lives=10, image=None, new_size=[83, 248]):
+    def __init__(self, position, lives=10, image=None, new_size=[75, 200]):
         if not image:
             image = "seringa.png"
         super().__init__(position, lives, [0, 0], image, new_size)
@@ -326,12 +326,12 @@ class Jogador(Nave):
         
         if self.deve_atirar == 1: # Verifica se realmente é para criar um novo tiro
             diferenca_tempo = time() - self.tempo_ultimo_tiro # Calcula a diferença do ultimo tiro para o momento atual
-            if diferenca_tempo > 0.5: # Verifica se pode atirar pela diferença de tempo
+            if diferenca_tempo > 0.6: # Verifica se pode atirar pela diferença de tempo
                 self.tempo_ultimo_tiro =  time() # Atualiza o tempo do ultimo tiro
                 
                 l = 1
-                if self.pontos > 10: l = 3
-                if self.pontos > 50: l = 5
+                if self.pontos > 10: l = 2
+                if self.pontos > 50: l = 3
         
                 p = self.get_pos()
                 speeds = self.get_fire_speed(l)
@@ -346,11 +346,15 @@ class Jogador(Nave):
 
         if shots == 1:
             speeds += [(0, -5)]
+            
+        if shots == 2:
+            speeds += [(-1, -3.5)]
+            speeds += [(1, -3.5)]
 
-        if shots > 1 and shots <= 3:
+        if shots == 3:
             speeds += [(0, -5)]
-            speeds += [(-2, -3)]
-            speeds += [(2, -3)]
+            speeds += [(-1.5, -4)]
+            speeds += [(1.5, -4)]
 
         if shots > 3 and shots <= 5:
             speeds += [(0, -5)]
@@ -366,7 +370,7 @@ class Tiro(ElementoSprite):
     def __init__(self, position, speed=None, image=None, list=None):
         if not image:
             image = "tiro.png"
-        super().__init__(image, position, speed)
+        super().__init__(image, position, speed, new_size=[42, 48])
         if list is not None:
             self.add(list)
 
