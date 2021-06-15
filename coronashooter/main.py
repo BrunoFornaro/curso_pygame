@@ -66,17 +66,39 @@ class Jogo:
         virii = self.elementos["virii"]
         if r > (len(virii)):
             if self.nivel > 0:
-                nivel_virus = random.randint(0, 10)
-                if nivel_virus > 7:
+                
+                tipo_virus = 8 + (self.nivel * 2) # Difine um range para nascerem virus diferentes a cada nível
+                if tipo_virus > 15: # Limita o range
+                    tipo_virus = 15
+                    
+                nivel_virus = random.randint(0, tipo_virus) # Cria um range para os vírus nascerem de acordo com uma proporção pré estabelecida
+                
+                if nivel_virus > 13:
+                    #enemy = Virus([0, 0], lives = 100, speed=[1,1], image="virinho.png")
+                    #size = enemy.get_size()
+                    #enemy.set_pos([min(max(x, size[0]/2), self.screen_size[0]-size[0]/2), 0])
+                    #enemy.set_speed = [self.jogardor.get_pos()[0] - enemy.get_pos[0], self.jogardor.get_pos()[1] - enemy.get_pos[1]]
+                    
+                    enemy = Virus([0, 0], lives = 100, speed=[0, random.randint(5,7)], image="virinho.png")
+                    size = enemy.get_size()
+                    enemy.set_pos([self.jogador.get_pos()[0], 0])
+                
+                elif nivel_virus > 7:
                     enemy = Virus([0, 0], lives = 3, speed=[random.randint(-1,1), random.randint(3,5)], image="virinho_mau.png") 
+                    size = enemy.get_size()
+                    enemy.set_pos([min(max(x, size[0]/2), self.screen_size[0]-size[0]/2), 0])
+                
                 else:
                     enemy = Virus([0, 0], speed=[random.randint(-1,1), random.randint(2,4)]) 
+                    size = enemy.get_size()
+                    enemy.set_pos([min(max(x, size[0]/2), self.screen_size[0]-size[0]/2), 0])
+            
             else:
                 enemy = Virus([0, 0])
-            size = enemy.get_size()
-            enemy.set_pos([min(max(x, size[0]/2), self.screen_size[0]-size[0]/2), 0])
+                size = enemy.get_size()
+                enemy.set_pos([min(max(x, size[0]/2), self.screen_size[0]-size[0]/2), 0])
             mesmo_lugar = pygame.sprite.spritecollide(enemy, virii, False)
-            if mesmo_lugar:
+            if mesmo_lugar: # Se os virus foram nascer sobrepostos, o vírus não nasce
                 return
             self.elementos["virii"].add(enemy)
 
@@ -96,10 +118,10 @@ class Jogo:
             self.nivel = 2
             self.jogador.set_lives(self.jogador.get_lives() + 6)
             self.xp_anterior = xp
-        elif (xp - self.xp_anterior) >= 50:
+        elif (xp - self.xp_anterior) >= 50: # Confere a diferença do xp atual pra ultima troca de nível
             self.xp_anterior = xp
             self.nivel += 1
-            self.quantidade_de_virus += 3
+            self.quantidade_de_virus += 2 # Quantidade de vírus a mais que nasce a cada nível
             
             
     def atualiza_elementos(self, dt):
