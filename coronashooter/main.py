@@ -53,18 +53,24 @@ class Jogo:
         
         # Define a tela
         self.screen = pygame.display.get_surface()
+        
+        # Quantidade máima de vírus na tela
+        self.quantidade_de_virus = 15
+        
+        # Diferença de xp entre os níveis
+        self.xp_anterior = 0
 
     def manutencao(self):
-        r = random.randint(0, 14)
+        r = random.randint(0, self.quantidade_de_virus)
         x = random.randint(1, self.screen_size[0])
         virii = self.elementos["virii"]
         if r > (len(virii)):
             if self.nivel > 0:
                 nivel_virus = random.randint(0, 10)
                 if nivel_virus > 7:
-                    enemy = Virus([0, 0], lives = 3, speed=[random.randint(-1,1), random.randint(3,4)], image="virinho_mau.png") 
+                    enemy = Virus([0, 0], lives = 3, speed=[random.randint(-1,1), random.randint(3,5)], image="virinho_mau.png") 
                 else:
-                    enemy = Virus([0, 0], speed=[random.randint(-1,1), random.randint(2,3)]) 
+                    enemy = Virus([0, 0], speed=[random.randint(-1,1), random.randint(2,4)]) 
             else:
                 enemy = Virus([0, 0])
             size = enemy.get_size()
@@ -89,7 +95,13 @@ class Jogo:
             self.fundo = Fundo("fundo3.png")
             self.nivel = 2
             self.jogador.set_lives(self.jogador.get_lives() + 6)
-
+            self.xp_anterior = xp
+        elif (xp - self.xp_anterior) >= 50:
+            self.xp_anterior = xp
+            self.nivel += 1
+            self.quantidade_de_virus += 3
+            
+            
     def atualiza_elementos(self, dt):
         self.fundo.update(dt)
         for v in self.elementos.values():
