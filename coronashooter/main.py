@@ -75,12 +75,12 @@ class Jogo:
                 nivel_virus = random.randint(0, tipo_virus) # Cria um range para os vírus nascerem de acordo com uma proporção pré estabelecida
                 
                 if nivel_virus > 13:
-                    enemy = Virus([0, 0], lives = 100, speed=[0, random.randint(5,7)], image="virinho.png")
+                    enemy = Virus([0, 0], lives = 100, speed=[0, random.randint(5,7)], image="brocolis.png")
                     size = enemy.get_size()
                     enemy.set_pos([self.jogador.get_pos()[0], 0])
                 
                 elif nivel_virus > 7:
-                    enemy = Virus([0, 0], lives = 3, speed=[random.randint(-1,1), random.randint(3,5)], image="virinho_mau.png") 
+                    enemy = Virus([0, 0], lives = 3, speed=[random.randint(-1,1), random.randint(3,5)], image="cenoura2.png") 
                     size = enemy.get_size()
                     enemy.set_pos([min(max(x, size[0]/2), self.screen_size[0]-size[0]/2), 0])
                 
@@ -111,7 +111,7 @@ class Jogo:
         # Verifica se deve mudar o nível pra 1
         if xp >= 10 and self.nivel == 0:
             # Altera o fundo
-            self.fundo = Fundo("fundo2.png")
+            self.fundo = Fundo("azulejo.png")
             # Altera o nível
             self.nivel = 1
             # Adiciona mais vidas para o jogador
@@ -119,7 +119,7 @@ class Jogo:
             self.gera_powerup() # Manda gera o powerup
             
         elif xp >= 50 and self.nivel == 1:
-            self.fundo = Fundo("fundo3.png")
+            self.fundo = Fundo("quadrados.png")
             self.nivel = 2
             self.jogador.set_lives(self.jogador.get_lives() + 6)
             self.xp_anterior = xp
@@ -155,10 +155,10 @@ class Jogo:
         if (powerup == 1 and # Se tiver comparando colisão de powerup e...
             #isinstance(elemento, pygame.sprite.Sprite) and # Se o powerup for um sprite e...
             pygame.sprite.spritecollide(elemento, list, 1)): # Se o jogador e o powerup tiverem colidido
-            poder = random.randint(1,2) # Randomiza o poder do powerup
+            poder = random.randint(1,3) # Randomiza o poder do powerup
             if poder == 1: # Se o tipo de powerup for 1
                 self.jogador.set_lives(self.jogador.get_lives() + 1) # Aumenta uma vida do jogador
-            elif poder == 2: # Se o tipo de powerup for 2
+            elif poder >= 2: # Se o tipo de powerup for 2
                 self.jogador.aumenta_tipo_arma() # Aumenta o tipo da arma
             return elemento.morto # Elimina o sprite do powerup
         
@@ -270,10 +270,10 @@ class Jogo:
 
 
 class Nave(ElementoSprite):
-    def __init__(self, position, lives=0, speed=[0, 0], image=None, new_size=[83, 248]):
+    def __init__(self, position, lives=0, speed=[0, 0], image=None, new_size=[100, 180]):
         self.acceleration = [5, 5]
         if not image:
-            image = "seringa.png"
+            image = "bebe.png"
         super().__init__(image, position, speed, new_size)
         self.set_lives(lives)
         self.limite = 10
@@ -327,15 +327,15 @@ class Nave(ElementoSprite):
 
 
 class Virus(Nave):
-    def __init__(self, position, lives=1, speed=None, image=None, size=(80, 80)):
+    def __init__(self, position, lives=1, speed=None, image=None, size=(70, 70)):
         if not image:
-            image = "virus.png"
+            image = "tomate.png"
         super().__init__(position, lives, speed, image, size)
         
 class Powerup(Nave): # Nova classe de powerups (poderes extras). Herda de nave, assim como virus
     def __init__(self, position, lives=1, speed=None, image=None, size=(80, 80)):
         if not image:
-            image = "powerup.png" # Altera a imagem para a imagem de powerup
+            image = "chocolate.png" # Altera a imagem para a imagem de powerup
         super().__init__(position, lives, speed, image, size)
 
 class Jogador(Nave):
@@ -349,9 +349,9 @@ class Jogador(Nave):
     das outras.
     """
 
-    def __init__(self, position, lives=10, image=None, new_size=[75, 200]):
+    def __init__(self, position, lives=10, image=None, new_size=[100, 170]):
         if not image:
-            image = "seringa.png"
+            image = "bebe.png"
         super().__init__(position, lives, [0, 0], image, new_size)
         self.pontos = 0 # Define os pontos começando em 0   
         
@@ -408,22 +408,22 @@ class Jogador(Nave):
         speeds = []
         if time() - self.tempo_ultimo_powerup < 5: # Aciona a arma com 4 tiro se o jogador tiver ganhado um powerup de arma recentemente
             # Arma especial de quando acaba de pegar o powerup de arma (só tem duração de 5 segundos)    
-            speeds += [(-1, -3.5)]
-            speeds += [(1, -3.5)]
-            speeds += [(-5, 0)]
-            speeds += [(5, 0)]
+            speeds += [(-1, -6)]
+            speeds += [(1, -6)]
+            speeds += [(-7, 0)]
+            speeds += [(7, 0)]
         else: # Caso contrário, aciona a arma de acordo com a quantidade (+1) de powerups de arma que o jogador já ganhou (limite de 3)
             if shots <= 0:
                 return speeds
             elif shots == 1:
-                speeds += [(0, -5)]
+                speeds += [(0, -6.5)]
             elif shots == 2:
-                speeds += [(-1, -3.5)]
-                speeds += [(1, -3.5)]
+                speeds += [(-1, -6.2)]
+                speeds += [(1, -6.2)]
             elif shots >= 3: 
-                speeds += [(0, -5)]
-                speeds += [(-1.5, -4)]
-                speeds += [(1.5, -4)]
+                speeds += [(0, -7)]
+                speeds += [(-1.8, -6)]
+                speeds += [(1.8, -6)]
             
         ''' # Arma descontínuada da versão (era muito forte)
         if shots == 5: 
@@ -440,8 +440,8 @@ class Jogador(Nave):
 class Tiro(ElementoSprite):
     def __init__(self, position, speed=None, image=None, list=None):
         if not image:
-            image = "tiro.png"
-        super().__init__(image, position, speed, new_size=[42, 48])
+            image = "lego_azul.png"
+        super().__init__(image, position, speed, new_size=[31, 35])
         if list is not None:
             self.add(list)
 
