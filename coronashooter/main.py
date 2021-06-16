@@ -8,6 +8,7 @@ from pygame.locals import (DOUBLEBUF,
                            QUIT,
                            K_ESCAPE, K_UP, K_DOWN, K_RCTRL, K_LCTRL,
                            K_SPACE, K_w, K_s, K_a, K_d # Para o jogo funcionar com o w, a, s, d e espaço
+                           
                            )
 from fundo import Fundo
 from elementos import ElementoSprite
@@ -74,11 +75,6 @@ class Jogo:
                 nivel_virus = random.randint(0, tipo_virus) # Cria um range para os vírus nascerem de acordo com uma proporção pré estabelecida
                 
                 if nivel_virus > 13:
-                    #enemy = Virus([0, 0], lives = 100, speed=[1,1], image="virinho.png")
-                    #size = enemy.get_size()
-                    #enemy.set_pos([min(max(x, size[0]/2), self.screen_size[0]-size[0]/2), 0])
-                    #enemy.set_speed = [self.jogardor.get_pos()[0] - enemy.get_pos[0], self.jogardor.get_pos()[1] - enemy.get_pos[1]]
-                    
                     enemy = Virus([0, 0], lives = 100, speed=[0, random.randint(5,7)], image="virinho.png")
                     size = enemy.get_size()
                     enemy.set_pos([self.jogador.get_pos()[0], 0])
@@ -101,6 +97,13 @@ class Jogo:
             if mesmo_lugar: # Se os virus foram nascer sobrepostos, o vírus não nasce
                 return
             self.elementos["virii"].add(enemy)
+        
+    def gera_powerup(self): # Gera um powerup novo
+        pw_up = Powerup([0, 0], speed=[random.randint(-1,1), random.randint(3,5)]) # Cria o powerup, com velocidade (angulo) aleatória num certo range
+        size = pw_up.get_size() # Define size igual ao tamanho do powerup
+        x = random.randint(1, self.screen_size[0]) # Posição aleatoria para o powerup "nascer"
+        pw_up.set_pos([min(max(x, size[0]/2), self.screen_size[0]-size[0]/2), 0]) # Define a posição do powerup, mas não deixa ele nascer fora da tela
+        self.elementos["powerup"].add(pw_up) # Adiciona o powerup (sprite)
 
     def muda_nivel(self):
         # Verifica o xp
@@ -113,16 +116,20 @@ class Jogo:
             self.nivel = 1
             # Adiciona mais vidas para o jogador
             self.jogador.set_lives(self.jogador.get_lives() + 3)
+            self.gera_powerup() # Manda gera o powerup
+            
         elif xp >= 50 and self.nivel == 1:
             self.fundo = Fundo("fundo3.png")
             self.nivel = 2
             self.jogador.set_lives(self.jogador.get_lives() + 6)
             self.xp_anterior = xp
+            self.gera_powerup() # Manda gera o powerup
+            
         elif (xp - self.xp_anterior) >= 50: # Confere a diferença do xp atual pra ultima troca de nível
             self.xp_anterior = xp
             self.nivel += 1
             self.quantidade_de_virus += 2 # Quantidade de vírus a mais que nasce a cada nível
-            
+            self.gera_powerup() # Manda gera o powerup
             
     def atualiza_elementos(self, dt):
         self.fundo.update(dt)
@@ -144,18 +151,29 @@ class Jogo:
         self.screen.blit(self.texto_pontos, self.texto_pontos_rect)
         self.screen.blit(self.texto_nivel, self.texto_nivel_rect)
         
-    def verifica_impactos(self, elemento, list, action):
-        if isinstance(elemento, pygame.sprite.RenderPlain):
-            hitted = pygame.sprite.groupcollide(elemento, list, 1, 0)
-            for v in hitted.values():
-                for o in v:
-                    action(o)
-            return hitted
-
-        elif isinstance(elemento, pygame.sprite.Sprite):
-            if pygame.sprite.spritecollide(elemento, list, 1):
-                action()
-            return elemento.morto
+    def verifica_impactos(self, elemento, list, action, powerup = 0):
+        if (powerup == 1 and # Se tiver comparando colisão de powerup e...
+            #isinstance(elemento, pygame.sprite.Sprite) and # Se o powerup for um sprite e...
+            pygame.sprite.spritecollide(elemento, list, 1)): # Se o jogador e o powerup tiverem colidido
+            poder = random.randint(1,2) # Randomiza o poder do powerup
+            if poder == 1: # Se o tipo de powerup for 1
+                self.jogador.set_lives(self.jogador.get_lives() + 1) # Aumenta uma vida do jogador
+            elif poder == 2: # Se o tipo de powerup for 2
+                self.jogador.aumenta_tipo_arma() # Aumenta o tipo da arma
+            return elemento.morto # Elimina o sprite do powerup
+        
+        else: # Se não for colisão de powerup, verifica as outras colisões
+            if isinstance(elemento, pygame.sprite.RenderPlain):
+                hitted = pygame.sprite.groupcollide(elemento, list, 1, 0)
+                for v in hitted.values():
+                    for o in v:
+                        action(o)
+                return hitted
+    
+            elif isinstance(elemento, pygame.sprite.Sprite):
+                if pygame.sprite.spritecollide(elemento, list, 1):
+                    action()
+                return elemento.morto
 
     def acao_elemento(self):
         self.verifica_impactos(self.jogador, self.elementos["tiros_inimigo"],
@@ -178,6 +196,10 @@ class Jogo:
 
         # Aumenta a pontos baseado no número de acertos:
         self.jogador.set_pontos(self.jogador.get_pontos() + len(hitted))
+        
+        # Verifica se o personagem trombou em algum powerup
+        self.verifica_impactos(self.jogador, self.elementos["powerup"],
+                               self.jogador.colisao, 1)
 
     def trata_eventos(self):
         event = pygame.event.poll()
@@ -224,6 +246,7 @@ class Jogo:
         self.elementos['jogador'] = pygame.sprite.RenderPlain(self.jogador)
         self.elementos['tiros'] = pygame.sprite.RenderPlain()
         self.elementos['tiros_inimigo'] = pygame.sprite.RenderPlain()
+        self.elementos['powerup'] = pygame.sprite.RenderPlain() # Cria a chave "powerup" no dicionário
         while self.run:
             clock.tick(1000 / dt)
 
@@ -248,12 +271,12 @@ class Jogo:
 
 class Nave(ElementoSprite):
     def __init__(self, position, lives=0, speed=[0, 0], image=None, new_size=[83, 248]):
-        self.acceleration = [3, 3]
+        self.acceleration = [5, 5]
         if not image:
             image = "seringa.png"
         super().__init__(image, position, speed, new_size)
         self.set_lives(lives)
-        self.limite = 7
+        self.limite = 10
 
     def get_lives(self):
         return self.lives
@@ -308,7 +331,12 @@ class Virus(Nave):
         if not image:
             image = "virus.png"
         super().__init__(position, lives, speed, image, size)
-
+        
+class Powerup(Nave): # Nova classe de powerups (poderes extras). Herda de nave, assim como virus
+    def __init__(self, position, lives=1, speed=None, image=None, size=(80, 80)):
+        if not image:
+            image = "powerup.png" # Altera a imagem para a imagem de powerup
+        super().__init__(position, lives, speed, image, size)
 
 class Jogador(Nave):
     """
@@ -325,11 +353,13 @@ class Jogador(Nave):
         if not image:
             image = "seringa.png"
         super().__init__(position, lives, [0, 0], image, new_size)
-        self.pontos = 0
+        self.pontos = 0 # Define os pontos começando em 0   
         
         self.deve_atirar = 0 # Define se deve ou não atirar quando chamar o método atira
         self.tempo_ultimo_tiro = 0 # Tempo do ultimo tiro
-
+        self.tipo_tiro = 1 # Difine o tipo do tiro
+        self.tempo_ultimo_powerup = 0 # Tempo da ultima vez q trocou a arma por um powerup
+        
     def update(self, dt):
         move_speed = (self.speed[0] * dt / 16,
                       self.speed[1] * dt / 16)
@@ -355,7 +385,11 @@ class Jogador(Nave):
 
     def set_pontos(self, pontos):
         self.pontos = pontos
-
+    
+    def aumenta_tipo_arma(self): # Função para aumentar o tipo da arma
+        self.tipo_tiro += 1 # Aumenta 1 no tipo de arma
+        self.tempo_ultimo_powerup = time() # Reseta o tempo para o jogador ficar com a arma especial de quando acaba de pegar powerup de arma
+        
     def atira(self, lista_de_tiros, image=None):
         
         if self.deve_atirar == 1: # Verifica se realmente é para criar um novo tiro
@@ -363,40 +397,43 @@ class Jogador(Nave):
             if diferenca_tempo > 0.6: # Verifica se pode atirar pela diferença de tempo
                 self.tempo_ultimo_tiro =  time() # Atualiza o tempo do ultimo tiro
                 
-                l = 1
-                if self.pontos > 10: l = 2
-                if self.pontos > 50: l = 3
+                if self.tipo_tiro > 3: self.tipo_tiro = 3 # Limita a arma em 3
         
                 p = self.get_pos()
-                speeds = self.get_fire_speed(l)
+                speeds = self.get_fire_speed(self.tipo_tiro) # Define a velocidade dos novos tiros
                 for s in speeds:
                     Tiro(p, s, image, lista_de_tiros)
 
     def get_fire_speed(self, shots):
         speeds = []
-
-        if shots <= 0:
-            return speeds
-
-        if shots == 1:
-            speeds += [(0, -5)]
-            
-        if shots == 2:
+        if time() - self.tempo_ultimo_powerup < 5: # Aciona a arma com 4 tiro se o jogador tiver ganhado um powerup de arma recentemente
+            # Arma especial de quando acaba de pegar o powerup de arma (só tem duração de 5 segundos)    
             speeds += [(-1, -3.5)]
             speeds += [(1, -3.5)]
-
-        if shots == 3:
-            speeds += [(0, -5)]
-            speeds += [(-1.5, -4)]
-            speeds += [(1.5, -4)]
-
-        if shots > 3 and shots <= 5:
+            speeds += [(-5, 0)]
+            speeds += [(5, 0)]
+        else: # Caso contrário, aciona a arma de acordo com a quantidade (+1) de powerups de arma que o jogador já ganhou (limite de 3)
+            if shots <= 0:
+                return speeds
+            elif shots == 1:
+                speeds += [(0, -5)]
+            elif shots == 2:
+                speeds += [(-1, -3.5)]
+                speeds += [(1, -3.5)]
+            elif shots >= 3: 
+                speeds += [(0, -5)]
+                speeds += [(-1.5, -4)]
+                speeds += [(1.5, -4)]
+            
+        ''' # Arma descontínuada da versão (era muito forte)
+        if shots == 5: 
             speeds += [(0, -5)]
             speeds += [(-2, -3)]
             speeds += [(2, -3)]
             speeds += [(-4, -2)]
             speeds += [(4, -2)]
-
+        '''
+        
         return speeds
 
 
