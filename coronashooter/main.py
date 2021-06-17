@@ -290,7 +290,7 @@ class Jogo:
                     key = event.key # Qual botão foi pressionado
                     if key == K_SPACE: # Se o botão pressionado for o espaço
                         break # Encerra o laço e inicia o jogo
-        
+            
         
         elif tela == 1: # Tela de pausa
             # Funcionalidade análogas a tela de início    
