@@ -221,7 +221,7 @@ class Jogo:
                                self.jogador.colisao, 1)
 
     def liga_desliga_musica(self):
-        if self.music:
+        if self.music: # Verifica se a musica está tocando
             pygame.mixer.music.pause() # Faz com que a música pare de tocar.
             self.music = False
         else:
@@ -229,12 +229,22 @@ class Jogo:
             self.music = True
         
     def ajusta_volume(self, av): # Controla o volume da música. av significa ajusta volume.
-        volume = pygame.mixer.music.get_volume()
-        volume += av
-        if volume >=1:
-            volume = 1
-        pygame.mixer.music.set_volume(volume)
-
+        volume = pygame.mixer.music.get_volume() # Volume atual
+        volume += av # Incrementa o volume de acordo com o ajuste
+        if volume >= 1: # Se o volume for ser ajustado para maior ou igual a um
+            volume = 1 # Limita o volume superiormente em 1
+        elif volume <= 0: # Se o volume for ser ajustado para menor ou igual a zero
+            volume = 0 # Limita o volume inferiomente em 0
+        pygame.mixer.music.set_volume(volume) # Ajusta o volume
+    
+    def verifica_muda_volume(self, key): # Função para verificar como o usuário deseja mudar o volume e alterá-lo
+        if key == K_m: # Se o jogador quiser deixar mudo
+            self.liga_desliga_musica() # Desliga a música
+        elif key == K_b: # Se o jogador quiser abaixar o volume
+            self.ajusta_volume(-0.1) # Abaixa o volume
+        elif key == K_n: # Se o jogador quiser aumentar o volume
+            self.ajusta_volume(0.1) # Aumenta o volume
+    
     def trata_eventos(self):
         event = pygame.event.poll()
         if event.type == pygame.QUIT:
@@ -252,12 +262,8 @@ class Jogo:
                 self.jogador.accel_right()
             elif key in (K_LEFT, K_a): # Agora funciona tanto na seta para a esqueda quanto no a
                 self.jogador.accel_left()
-            elif key == K_m:
-                self.liga_desliga_musica()
-            elif key == K_b:
-                self.ajusta_volume(-0.1)
-            elif key == K_n:
-                self.ajusta_volume(0.1)
+            else:
+                self.verifica_muda_volume(key) # Verifica se o usuário que alterar o volume
                 
         if event.type == KEYUP: # Verifica se a tecla foi solta
             key = event.key
@@ -279,7 +285,8 @@ class Jogo:
         self.jogador.atira(self.elementos["tiros"]) # Pede par atirar (mas atira somente se o deve_atirar for igual a 1)
     
     def inicio_pausa_fim(self, tela = 0): # Função das telas de inicio, pausa e game over
-        
+        # Seria possível fazer essa função com menos linhas de código, mas seria mais difícil de compreender posteriormente
+    
         if tela == 0: # Tela de inicio
             iniciar = Fundo("tela_inicio.png") # Define a imagem de fundo
             iniciar.draw(self.tela) # Desenha a tela com o fundo
@@ -290,7 +297,8 @@ class Jogo:
                     key = event.key # Qual botão foi pressionado
                     if key == K_SPACE: # Se o botão pressionado for o espaço
                         break # Encerra o laço e inicia o jogo
-            
+                    else:
+                        self.verifica_muda_volume(key) # Verifica se o usuário que alterar o volume
         
         elif tela == 1: # Tela de pausa
             # Funcionalidade análogas a tela de início    
@@ -307,10 +315,13 @@ class Jogo:
                         self.run = False # Encerra o loop principal do Jogo()
                         self.sair_pela_pausa = True # Finaliza o jogo diretamente
                         break # Encerra o laço e sai totalmente do jogo
+                    else:
+                        self.verifica_muda_volume(key) # Verifica se o usuário que alterar o volume
         
         elif tela == 2: # Tela de game over
             game_over = Fundo("tela_game_over.png")
-            game_over.draw(self.tela)
+            game_over.draw(self.tela) 
+            self.placar() # Desenha o placar final
             pygame.display.flip()
             while True:
                 event = pygame.event.poll()
@@ -320,8 +331,9 @@ class Jogo:
                         return True # Encerra o laço e reinicia o jogo
                     elif key in (K_ESCAPE, K_p): # Se o botão pressionado for esc ou p
                         return False # Encerra o laço e sai totalmente do jogo
+                    else:
+                        self.verifica_muda_volume(key) # Verifica se o usuário que alterar o volume
          
-            
 
     def loop(self):
         # Foi necessário colocar a definição de algumas variáveis do init aqui novamente, para funcionar o "jogar novamente"
