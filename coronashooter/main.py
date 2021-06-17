@@ -335,7 +335,7 @@ class Jogo:
         self.elementos['tiros'] = pygame.sprite.RenderPlain()
         self.elementos['tiros_inimigo'] = pygame.sprite.RenderPlain()
         self.elementos['powerup'] = pygame.sprite.RenderPlain() # Cria a chave "powerup" no dicionário
-        self.inicio_pausa_fim(1) # Vai para a tela de inicio
+        self.inicio_pausa_fim(0) # Vai para a tela de inicio
         self.run = True # Define o jogo rodando
         self.sair_pela_pausa = False # Verifica se o jogador quer sair do jogo a partir da tela de pausa
         while self.run:
