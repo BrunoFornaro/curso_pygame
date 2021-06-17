@@ -3,9 +3,10 @@ from pygame.locals import (DOUBLEBUF,
                            FULLSCREEN,
                            KEYDOWN,
                            KEYUP,
-                           K_LEFT,
+                             K_LEFT,
                            K_RIGHT,
                            QUIT,
+                           K_m, K_n, K_b,
                            K_ESCAPE, K_UP, K_DOWN, K_RCTRL, K_LCTRL,
                            K_SPACE, K_w, K_s, K_a, K_d # Para o jogo funcionar com o w, a, s, d e espaço
                            )
@@ -14,6 +15,7 @@ from elementos import ElementoSprite
 import random
 
 from time import time
+from time import sleep
 import os
 
 class Jogo:
@@ -59,7 +61,15 @@ class Jogo:
         
         # Diferença de xp entre os níveis
         self.xp_anterior = 0
-
+        
+        #Música
+        pygame.mixer.music.load('Bebe.mp3') # Carrega e guarda a música que será tocada durante o jogo.
+        pygame.mixer.music.play(-1) # Faz com que a música entre em loop.
+        self.music = True
+        
+        #Sons
+        self.derrota = pygame.mixer.Sound('Choro_do_Fim.mp3') # Som feito quando o bebê perde
+        
     def manutencao(self):
         r = random.randint(0, self.quantidade_de_virus)
         x = random.randint(1, self.screen_size[0])
@@ -161,6 +171,8 @@ class Jogo:
         self.verifica_impactos(self.jogador, self.elementos["tiros_inimigo"],
                                self.jogador.alvejado)
         if self.jogador.morto:
+            pygame.mixer.Sound.play(self.derrota) # Som emitido quando o bebê perde
+            sleep(2)
             self.run = False
             return
 
@@ -168,6 +180,8 @@ class Jogo:
         self.verifica_impactos(self.jogador, self.elementos["virii"],
                                self.jogador.colisao)
         if self.jogador.morto:
+            pygame.mixer.Sound.play(self.derrota) # Som emitido quando o bebê perde
+            sleep(2)
             self.run = False
             return
         
@@ -178,6 +192,21 @@ class Jogo:
 
         # Aumenta a pontos baseado no número de acertos:
         self.jogador.set_pontos(self.jogador.get_pontos() + len(hitted))
+
+    def liga_desliga_musica(self):
+        if self.music:
+            pygame.mixer.music.pause() # Faz com que a música pare de tocar.
+            self.music = False
+        else:
+            pygame.mixer.music.unpause() # Faz com que a música volte a tocar.
+            self.music = True
+        
+    def ajusta_volume(self, av): # av significa ajusta volume. Essa definição faz com que a música aumente ou diminua
+        volume = pygame.mixer.music.get_volume()
+        volume += av
+        if volume >1:
+            volume = 1
+        pygame.mixer.music.set_volume(volume)
 
     def trata_eventos(self):
         event = pygame.event.poll()
@@ -196,6 +225,12 @@ class Jogo:
                 self.jogador.accel_right()
             elif key in (K_LEFT, K_a): # Agora funciona tanto na seta para a esqueda quanto no a
                 self.jogador.accel_left()
+            elif key == K_m:
+                self.liga_desliga_musica()
+            elif key == K_b:
+                self.ajusta_volume(-0.1)
+            elif key == K_n:
+                self.ajusta_volume(0.1)
                 
         if event.type == KEYUP: # Verifica se a tecla foi solta
             key = event.key
@@ -211,7 +246,8 @@ class Jogo:
                 self.jogador.set_speed((0,self.jogador.get_speed()[1])) # A velocidade no eixo x zera
             elif key in (K_LEFT, K_a):
                 self.jogador.set_speed((0,self.jogador.get_speed()[1])) # A velocidade no eixo x zera
-            
+    
+                
             
         self.jogador.atira(self.elementos["tiros"]) # Pede par atirar (mas atira somente se o deve_atirar for igual a 1)
         
@@ -346,7 +382,7 @@ class Jogador(Nave):
 
         elif (self.rect.top < 0):
             self.rect.top = 0
-
+            
     def get_pos(self):
         return (self.rect.center[0], self.rect.top)
 
