@@ -38,6 +38,12 @@ class ElementoSprite(pygame.sprite.Sprite):
 
     def set_speed(self, speed):
         self.speed = speed
+        '''
+        if speed[0] < 10:
+            self.speed = (speed[0], self.get_speed()[1])
+        if speed[1] < 10:
+            self.speed = (self.get_speed()[0], speed[1])
+        '''
 
     def get_pos(self):
         return (self.rect.center[0],
