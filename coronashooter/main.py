@@ -228,10 +228,10 @@ class Jogo:
             pygame.mixer.music.unpause() # Faz com que a música volte a tocar.
             self.music = True
         
-    def ajusta_volume(self, av): # Essa definição faz com que a música aumente ou diminua. av significa ajusta volume.
+    def ajusta_volume(self, av): # Controla o volume da música. av significa ajusta volume.
         volume = pygame.mixer.music.get_volume()
         volume += av
-        if volume >1:
+        if volume >=1:
             volume = 1
         pygame.mixer.music.set_volume(volume)
 
