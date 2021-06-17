@@ -1,20 +1,25 @@
-Integrantes do grupo:
+# Integrantes do grupo:
 
 Bruno Pereira Fornaro - B44398
+
 Daniel Ambrosim Falqueto - B43618
+
 Gustavo Navarro Rozas - B42592
+
 Hugo de Araújo e Silva - B43907
+
 Matheus Medeiros Carvalho da Fonseca - B44252
 
+# Objetivo
+O intuito do nosso trabalho foi fazer um shooter com o tema bebê, que consiste em um bebê que não gosta de verduras e, por isso, atira brinquedos nelas.
 
-	O intuito do nosso trabalho foi fazer um shooter com o tema bebê, que consiste em um bebê que não gosta de verduras e atirar brinquedos nelas.
-
-	Alteramos a imagem de fundo do código original, que era o espaço para azulejo (verde), madeira e quadrado, dando 3 fases do jogo.
-Mudamos também a imagem da siringa para a de um bebê, já que foi o tema escolhido. A alteração dos inimigos, do código original, também foi feita,
+# Alterações feitas
+## Novo tema
+Alteramos a imagem de fundo do código original, que era o espaço para azulejo (verde), madeira e quadrado, dando 3 fases do jogo.
+Mudamos também a imagem da seringa para a de um bebê, já que foi o tema escolhido. A alteração dos inimigos, do código original, também foi feita,
 mudando para verduras e legumes.
 
-Principais alterações 
-
+## Principais alterações 
 - Foram removidos os caracteres especiais das 'variáveis', corrigindo o fim do jogo (adicionando o quit depois de encerrar o loop);
 - Mudanças nos níveis;
 - Tempo de tiro limitado a um disparo a cada meio segundo;
@@ -35,3 +40,8 @@ Principais alterações
 - Novas imagens foram colocadas, tamanhos e velocidades dos tiros alterados;
 - Uma música autoral foi feita para o jogo, som para derrota, som para colisão do tiro com o inimigo foram implementados;
 - Teclas para alterar o som foram adicionadas. M para mutar, N para diminuir e B para aumentar o som.
+
+# Observações
+Vale ressaltar que foi tomado o devido cuidado para que o resultado final incluísse imagens e áudios livres, inclusive alguns dos nossos áudios, como a música de fundo do jogo e o som de acertar o inimigo são autorais do nosso grupo.
+
+
