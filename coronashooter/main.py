@@ -7,8 +7,8 @@ from pygame.locals import (DOUBLEBUF,
                            K_RIGHT,
                            QUIT,
                            K_ESCAPE, K_UP, K_DOWN, K_RCTRL, K_LCTRL,
-                           K_SPACE, K_w, K_s, K_a, K_d # Para o jogo funcionar com o w, a, s, d e espaço
-                           
+                           K_SPACE, K_w, K_s, K_a, K_d, # Para o jogo funcionar com o w, a, s, d e espaço
+                           K_p # Pause no botão p (ou esc)
                            )
 from fundo import Fundo
 from elementos import ElementoSprite
@@ -32,15 +32,15 @@ class Jogo:
 
         self.screen_size = self.tela.get_size()
         pygame.mouse.set_visible(0)
-        pygame.display.set_caption('Corona Shooter')
+        pygame.display.set_caption('Baby Shooter')
         self.run = True
         
         self.fonte = pygame.font.Font("freesansbold.ttf", 32) # Define fonte
         
         # Define os textos do placar
-        self.texto_vidas = self.fonte.render("Vidas: ", True, (0,255,0), (0,0,0))
-        self.texto_pontos = self.fonte.render("Pontos: ", True, (0,255,0), (0,0,0))
-        self.texto_nivel = self.fonte.render("Nível: ", True, (0,255,0), (0,0,0))
+        self.texto_vidas = self.fonte.render("Vidas: ", True, (0,0,0), (88,198,247))
+        self.texto_pontos = self.fonte.render("Pontos: ", True, (0,0,0), (88,198,247))
+        self.texto_nivel = self.fonte.render("Nível: ", True, (0,0,0), (88,198,247))
         
         # Define os "retângulos" do placar
         self.texto_vidas_rect = self.texto_vidas.get_rect()
@@ -126,6 +126,8 @@ class Jogo:
             self.gera_powerup() # Manda gera o powerup
             
         elif (xp - self.xp_anterior) >= 50: # Confere a diferença do xp atual pra ultima troca de nível
+            fundos = random.choice(["azulejo.png","quadrados.png","madeira.png"]) # Atualiza o fundo aleatóriamenta da fase 4 em diante
+            self.fundo = Fundo(fundos)
             self.xp_anterior = xp
             self.nivel += 1
             self.quantidade_de_virus += 2 # Quantidade de vírus a mais que nasce a cada nível
@@ -143,9 +145,9 @@ class Jogo:
     
     def placar(self):
         # Gera os textos do placar
-        self.texto_vidas = self.fonte.render(f"Vidas: {self.jogador.get_lives()}", True, (0,255,0), (0,0,0))
-        self.texto_pontos = self.fonte.render(f"Pontos: {self.jogador.get_pontos()}", True, (0,255,0), (0,0,0))
-        self.texto_nivel = self.fonte.render(f"Nível: {self.nivel}", True, (0,255,0), (0,0,0))
+        self.texto_vidas = self.fonte.render(f"Vidas: {self.jogador.get_lives()}", True, (0,0,0), (88,198,247))
+        self.texto_pontos = self.fonte.render(f"Pontos: {self.jogador.get_pontos()}", True, (0,0,0), (88,198,247))
+        self.texto_nivel = self.fonte.render(f"Nível: {self.nivel}", True, (0,0,0), (88,198,247))
         # Desenha o placar
         self.screen.blit(self.texto_vidas, self.texto_vidas_rect)
         self.screen.blit(self.texto_pontos, self.texto_pontos_rect)
@@ -204,7 +206,7 @@ class Jogo:
     def trata_eventos(self):
         event = pygame.event.poll()
         if event.type == pygame.QUIT:
-            self.run = False
+            self.run = False # Finaliza o jogo
 
         if event.type == KEYDOWN: # Verifica se foi pressionada uma tecla
             key = event.key
@@ -221,8 +223,8 @@ class Jogo:
                 
         if event.type == KEYUP: # Verifica se a tecla foi solta
             key = event.key
-            if key == K_ESCAPE:
-                self.run = False
+            if key in (K_ESCAPE, K_p):
+                self.inicio_pausa_fim(1) # Vai para a tela de pausa
             elif key in (K_LCTRL, K_RCTRL, K_SPACE):
                 self.jogador.deve_atirar = 0 # Não deve atirar
             elif key in (K_UP, K_w):
@@ -236,17 +238,67 @@ class Jogo:
             
             
         self.jogador.atira(self.elementos["tiros"]) # Pede par atirar (mas atira somente se o deve_atirar for igual a 1)
+    
+    def inicio_pausa_fim(self, tela = 0): # Função das telas de inicio, pausa e game over
         
+        if tela == 0: # Tela de inicio
+            iniciar = Fundo("tela_inicio.png") # Define a imagem de fundo
+            iniciar.draw(self.tela) # Desenha a tela com o fundo
+            pygame.display.flip() # Renderiza a imagem
+            while True: # Espera a ação do jogador
+                event = pygame.event.poll() # Ultima ação (pressionar ou soltar botões)
+                if event.type == KEYDOWN: # Se o botão for pressionado
+                    key = event.key # Qual botão foi pressionado
+                    if key == K_SPACE: # Se o botão pressionado for o espaço
+                        break # Encerra o laço e inicia o jogo
+        
+        
+        elif tela == 1: # Tela de pausa
+            # Funcionalidade análogas a tela de início    
+            pausa = Fundo("tela_pausa.png")
+            pausa.draw(self.tela)
+            pygame.display.flip()
+            while True:
+                event = pygame.event.poll()
+                if event.type == KEYDOWN:
+                    key = event.key
+                    if key == K_SPACE: # Se o botão pressionado for espaço
+                        break # Encerra o laço e retorna ao jogo
+                    elif key in (K_ESCAPE, K_p): # Se o botão pressionado for esc ou p
+                        self.run = False # Encerra o loop principal do Jogo()
+                        self.sair_pela_pausa = True # Finaliza o jogo diretamente
+                        break # Encerra o laço e sai totalmente do jogo
+        
+        elif tela == 2: # Tela de game over
+            game_over = Fundo("tela_game_over.png")
+            game_over.draw(self.tela)
+            pygame.display.flip()
+            while True:
+                event = pygame.event.poll()
+                if event.type == KEYDOWN:
+                    key = event.key
+                    if key == K_SPACE: # Se o botão pressionado for espaço
+                        return True # Encerra o laço e reinicia o jogo
+                    elif key in (K_ESCAPE, K_p): # Se o botão pressionado for esc ou p
+                        return False # Encerra o laço e sai totalmente do jogo
+         
+            
 
     def loop(self):
+        # Foi necessário colocar a definição de algumas variáveis do init aqui novamente, para funcionar o "jogar novamente"
         clock = pygame.time.Clock()
         dt = 16
+        self.nivel = 0
+        self.fundo = Fundo()
         self.elementos['virii'] = pygame.sprite.RenderPlain(Virus([120, 50]))
         self.jogador = Jogador([200, 400], 5)
         self.elementos['jogador'] = pygame.sprite.RenderPlain(self.jogador)
         self.elementos['tiros'] = pygame.sprite.RenderPlain()
         self.elementos['tiros_inimigo'] = pygame.sprite.RenderPlain()
         self.elementos['powerup'] = pygame.sprite.RenderPlain() # Cria a chave "powerup" no dicionário
+        self.inicio_pausa_fim(1) # Vai para a tela de inicio
+        self.run = True # Define o jogo rodando
+        self.sair_pela_pausa = False # Verifica se o jogador quer sair do jogo a partir da tela de pausa
         while self.run:
             clock.tick(1000 / dt)
 
@@ -267,7 +319,10 @@ class Jogo:
             self.placar()
             
             pygame.display.flip()
-
+        if self.sair_pela_pausa:
+            return False
+        else: 
+            return self.inicio_pausa_fim(2) # Vai para a tela de game over
 
 class Nave(ElementoSprite):
     def __init__(self, position, lives=0, speed=[0, 0], image=None, new_size=[100, 180]):
@@ -447,6 +502,8 @@ class Tiro(ElementoSprite):
 
 
 if __name__ == '__main__':
-    J = Jogo()
-    J.loop()
-    pygame.quit()
+    J = Jogo() 
+    continuar_jogando = True # Começar a jogar
+    while continuar_jogando == True: # Verifica se o jogador quer continuar jogando depois de perder
+        continuar_jogando = J.loop() # Inicia o jogo e retorna se o jogador quer jogar novamente
+    pygame.quit() # Encerra o jogo

@@ -14,7 +14,7 @@ class Fundo:
         """
         image = os.path.join('imagens', image)
         image = pygame.image.load(image).convert()
-
+        
         self.imagesize = image.get_size()
         self.pos = [0, -1 * self.imagesize[1]]
         screen = pygame.display.get_surface()
