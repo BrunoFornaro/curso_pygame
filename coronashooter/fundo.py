@@ -8,13 +8,13 @@ class Fundo:
     Esta classe cria o fundo do jogo
     """
 
-    def __init__(self, image="space.png"):
+    def __init__(self, image="madeira.png"):
         """
         Desenha o fundo da tela
         """
         image = os.path.join('imagens', image)
         image = pygame.image.load(image).convert()
-
+        
         self.imagesize = image.get_size()
         self.pos = [0, -1 * self.imagesize[1]]
         screen = pygame.display.get_surface()
