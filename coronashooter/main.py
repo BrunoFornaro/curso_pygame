@@ -160,6 +160,7 @@ class Jogo:
             for v in hitted.values():
                 for o in v:
                     action(o)
+                    pygame.mixer.Sound('Colisão_Lego_Comida.mp3')
             return hitted
 
         elif isinstance(elemento, pygame.sprite.Sprite):
