@@ -65,10 +65,10 @@ class Jogo:
         #Música
         pygame.mixer.music.load('Bebe.mp3') # Carrega e guarda a música que será tocada durante o jogo.
         pygame.mixer.music.play(-1) # Faz com que a música entre em loop.
-        self.music = True
+        self.music = True # Faz com que a música comece a tocar
         
         #Sons
-        self.derrota = pygame.mixer.Sound('Choro_do_Fim.mp3') # Som feito quando o bebê perde
+        self.derrota = pygame.mixer.Sound('Choro_do_Fim.mp3') # Som feito quando o bebê perde.        
         
     def manutencao(self):
         r = random.randint(0, self.quantidade_de_virus)
@@ -160,7 +160,6 @@ class Jogo:
             for v in hitted.values():
                 for o in v:
                     action(o)
-                    pygame.mixer.Sound('Colisão_Lego_Comida.mp3')
             return hitted
 
         elif isinstance(elemento, pygame.sprite.Sprite):
@@ -181,7 +180,7 @@ class Jogo:
         self.verifica_impactos(self.jogador, self.elementos["virii"],
                                self.jogador.colisao)
         if self.jogador.morto:
-            pygame.mixer.Sound.play(self.derrota) # Som emitido quando o bebê perde
+            pygame.mixer.Sound.play(self.derrota) # Som emitido quando o bebê perde.
             sleep(2)
             self.run = False
             return
@@ -190,6 +189,9 @@ class Jogo:
         hitted = self.verifica_impactos(self.elementos["tiros"],
                                         self.elementos["virii"],
                                         Virus.alvejado)
+        if hitted:
+            som_de_colisao = pygame.mixer.Sound('Colisão_Lego_Comida.mp3') # Som feito quando uma legume colide com um brinquedo.
+            som_de_colisao.play() # Ativa o som no momento do impacto.
 
         # Aumenta a pontos baseado no número de acertos:
         self.jogador.set_pontos(self.jogador.get_pontos() + len(hitted))
@@ -202,7 +204,7 @@ class Jogo:
             pygame.mixer.music.unpause() # Faz com que a música volte a tocar.
             self.music = True
         
-    def ajusta_volume(self, av): # av significa ajusta volume. Essa definição faz com que a música aumente ou diminua
+    def ajusta_volume(self, av): # Essa definição faz com que a música aumente ou diminua. av significa ajusta volume.
         volume = pygame.mixer.music.get_volume()
         volume += av
         if volume >1:
@@ -292,7 +294,7 @@ class Nave(ElementoSprite):
         self.set_lives(lives)
         self.limite = 7
 
-    def get_lives(self):
+    def get_lives(self):   
         return self.lives
 
     def set_lives(self, lives):
