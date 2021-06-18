@@ -2,7 +2,6 @@ import pygame
 import os
 from math import ceil
 
-
 class Fundo:
     """
     Esta classe cria o fundo do jogo
@@ -14,6 +13,10 @@ class Fundo:
         """
         image = os.path.join('imagens', image)
         image = pygame.image.load(image).convert()
+        
+        largura = pygame.display.get_surface().get_rect().right # Largura da tela
+        altura = pygame.display.get_surface().get_rect().bottom # Altura da tela
+        image = pygame.transform.scale(image, (largura, altura)) # Redimensiona a imagem do fundo para ficar do tamanho da tela
         
         self.imagesize = image.get_size()
         self.pos = [0, -1 * self.imagesize[1]]
@@ -32,6 +35,10 @@ class Fundo:
                 back.blit(image, (i * self.imagesize[0], j * self.imagesize[1]))
 
         self.image = back
+
+    
+        
+
 
     def update(self, dt):
         self.pos[1] += 1

@@ -6,7 +6,7 @@ from pygame.locals import (DOUBLEBUF,
                              K_LEFT,
                            K_RIGHT,
                            QUIT,
-                           K_m, K_n, K_b,
+                           K_m, K_n, K_b, # Botões para ligar e desligar a música, abaixar e aumentar volume
                            K_ESCAPE, K_UP, K_DOWN, K_RCTRL, K_LCTRL,
                            K_SPACE, K_w, K_s, K_a, K_d, # Para o jogo funcionar com o w, a, s, d e espaço
                            K_p # Pause no botão p (ou esc)
@@ -18,6 +18,7 @@ import random
 from time import time
 from time import sleep
 import os
+
 
 class Jogo:
     def __init__(self, size=(1000, 1000), fullscreen=False):
@@ -63,13 +64,14 @@ class Jogo:
         # Diferença de xp entre os níveis
         self.xp_anterior = 0
         
-        #Música
-        pygame.mixer.music.load('Bebe.mp3') # Carrega e guarda a música que será tocada durante o jogo.
+        # Música
+        pygame.mixer.music.load(os.path.join('audios', 'musica_bebe.mp3')) # Carrega e guarda a música que será tocada durante o jogo.
         pygame.mixer.music.play(-1) # Faz com que a música entre em loop.
         self.music = True # Faz com que a música comece a tocar
         
-        #Sons
-        self.derrota = pygame.mixer.Sound('Choro_do_Fim.mp3') # Som feito quando o bebê perde.        
+        # Sons
+        self.derrota = pygame.mixer.Sound(os.path.join('audios', 'choro_do_fim.mp3')) # Som feito quando o bebê perde.        
+        self.som_colisao = os.path.join('audios', 'colisão_lego_comida.mp3') # Audio com o som de colisão
         
     def manutencao(self):
         r = random.randint(0, self.quantidade_de_virus)
@@ -209,8 +211,9 @@ class Jogo:
         hitted = self.verifica_impactos(self.elementos["tiros"],
                                         self.elementos["virii"],
                                         Virus.alvejado)
-        if hitted:
-            som_de_colisao = pygame.mixer.Sound('Colisão_Lego_Comida.mp3') # Som feito quando uma legume colide com um brinquedo.
+        
+        if hitted: # Se o inimigo for acertado (vai emitir som de colisão)
+            som_de_colisao = pygame.mixer.Sound(self.som_colisao) # Som feito quando uma legume colide com um brinquedo.
             som_de_colisao.play() # Ativa o som no momento do impacto.
 
         # Aumenta a pontos baseado no número de acertos:
@@ -279,10 +282,9 @@ class Jogo:
                 self.jogador.set_speed((0,self.jogador.get_speed()[1])) # A velocidade no eixo x zera
             elif key in (K_LEFT, K_a):
                 self.jogador.set_speed((0,self.jogador.get_speed()[1])) # A velocidade no eixo x zera
-    
-                
             
         self.jogador.atira(self.elementos["tiros"]) # Pede par atirar (mas atira somente se o deve_atirar for igual a 1)
+
     
     def inicio_pausa_fim(self, tela = 0): # Função das telas de inicio, pausa e game over
         # Seria possível fazer essa função com menos linhas de código, mas seria mais difícil de compreender posteriormente
