@@ -43,7 +43,7 @@ mudando para verduras e legumes.
 - Uma música autoral foi feita para o jogo. Adicionado som para derrota e som para colisão (também autoral) do tiro com o inimigo foram implementados;
 - Teclas para alterar o som foram adicionadas. M para mutar, N para diminuir e B para aumentar o som.
 - Adicionado menu de iniciar, de pausa e de fim de jogo (game over). O jogador pode pausar, sair do jogo, aumentar ou diminuir o volume e jogar novamente, caso perca.
-- A princípio, a modificação mais recente (e final) está na tag "a2_31_final". O jogo deve ser executado pelo "main.py" dentro da pasta "coronashooter".
+- A princípio, a modificação mais recente (e final) está na tag "a2_32_final". O jogo deve ser executado pelo "main.py" dentro da pasta "coronashooter".
 
 
 # Observações
