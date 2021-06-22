@@ -18,7 +18,7 @@ class ElementoSprite(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         screen = pygame.display.get_surface()
         self.area = screen.get_rect()
-
+        
         self.set_pos(position)
         self.set_speed(speed or (0, 2))
 
